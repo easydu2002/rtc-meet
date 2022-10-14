@@ -1,0 +1,12 @@
+
+{
+  "login": {
+    "title": "Welcome!",
+    "subTitle": "Lorem Ipsum is simply dummy test of thr printing and typesetting industry.",
+    "account": "Username",
+    "password": "Password",
+    "login": "Login",
+    "remember": "Remember me",
+    "forgot": "Forgot Password?",
+  }
+}

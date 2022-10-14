@@ -1,0 +1,21 @@
+{
+  "login": {
+    "title": "欢迎!",
+    "subTitle": "Lorem Ipsum is simply dummy test of thr printing and typesetting industry.",
+    "account": "用户名",
+    "password": "密码",
+    "login": "登录",
+    "remember": "记住密码",
+    "forgot": "忘记密码?",
+    "usernameTip": "xxxxxxxxxx",
+    "passwordTip": "*********"
+  },
+  "home": {
+    "chat": {
+      "searchTip": "搜索 人或群组",
+      "recent": "最近",
+      "groups": "群组",
+      "message": "消息"
+    }
+  }
+}
