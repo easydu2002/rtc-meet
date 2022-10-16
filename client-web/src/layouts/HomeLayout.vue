@@ -9,7 +9,7 @@
 
   <section flex h-full>
 
-    <div w-310px style="background-color: var(--chat-bg-color)">
+    <div w-310px style="background-color: var(--chat-bg-color)" box-border p-20px>
       <slot name="op" />
     </div>
 

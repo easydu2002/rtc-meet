@@ -6,7 +6,8 @@
 defineProps({
   modelValue: String,
   type: String,
-  placeholder: String
+  placeholder: String,
+  width: { type: String, default: () => '100%' }
 })
 </script>
 
@@ -14,7 +15,7 @@ defineProps({
 <template>
 
 
-  <section class="r-input" rounded>
+  <section class="r-input" rounded-lg>
 
     <div class="r-input__prepend" v-if="$slots.prepend">
       <slot name="prepend" />
@@ -22,7 +23,7 @@ defineProps({
 
     <input :type="$props.type" v-model="$props.modelValue" :placeholder="$props.placeholder">
     
-    <div class="r-input__prepend" v-if="$slots.append">
+    <div class="r-input__prepend" v-if="$slots.append" flex items-center justify-center p-x-8px>
       <slot name="append" />
     </div>
   </section>
@@ -40,6 +41,8 @@ defineProps({
 
   display: flex;
   background-color: #fff;
+
+  width: v-bind($props.width);
 }
 .r-input input {
   
@@ -48,5 +51,6 @@ defineProps({
   padding: 0 20px;
   flex: 1;
   color: var(--r-input-font-color);
+  background-color: transparent;
 }
 </style>

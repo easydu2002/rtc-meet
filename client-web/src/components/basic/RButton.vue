@@ -45,7 +45,7 @@ defineProps({
   margin-left: 8px;
 }
 .r-button--primary {
-  --r-button-bg-color: var(--primary-color);
+  --r-button-bg-color: var(--color-primary);
   --r-button-text-color: #fff;
 }
 </style>

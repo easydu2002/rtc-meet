@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import RInput from '../components/form/RInput.vue';
+import RIcon from '../components/basic/RIcon.vue';
+import { useI18n } from 'vue-i18n';
 
+const {t} = useI18n()
 </script>
 
 
 <template>
 
-  <header flex h-60px items-center style="background-color: var(--primary-color)">
+  <header flex h-60px items-center style="background-color: var(--color-primary)">
     <img class="logo" src="./../assets/images/logo.png"/>
 
-    <RInput />
+    <RInput :placeholder="t('home.globalSearchTip')" width="500px">
+      <template #append>
+        <RIcon type="person-circle" />
+      </template>
+    </RInput>
   </header>
 
 </template>

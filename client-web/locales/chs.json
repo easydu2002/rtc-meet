@@ -11,6 +11,13 @@
     "passwordTip": "*********"
   },
   "home": {
+    "globalSearchTip": "通过名称或邮箱搜索",
+    "nav": {
+      "activity": "通知",
+      "chat": "聊天",
+      "meet": "会议",
+      "calender": "通知"
+    },
     "chat": {
       "searchTip": "搜索 人或群组",
       "recent": "最近",

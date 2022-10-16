@@ -6,6 +6,9 @@ import RInput from '../../../components/form/RInput.vue';
 import RButton from '../../../components/basic/RButton.vue';
 import { theUserStore } from '../../../store/user';
 import { useRouter } from 'vue-router';
+import RIcon from '../../../components/basic/RIcon.vue';
+import RCheckbox from '../../../components/basic/RCheckbox.vue';
+import RFormItem from '../../../components/form/RFormItem.vue';
 
 
 /**
@@ -19,6 +22,8 @@ const userInfo = ref({
   username: '',
   password: '',
 })
+
+const rememberMe = ref(false)
 
 const login = function() {
   theUserStore.userInfo = userInfo.value
@@ -34,11 +39,33 @@ const login = function() {
 
     <section class="login-form__body">
       <h1 text-42px>{{ t('login.title') }}</h1>
-      <p text-20px>{{ t('login.subTitle') }}</p>
+      <p text-14px color-regular m-b-20px>{{ t('login.subTitle') }}</p>
+
+      <RFormItem :label="t('login.account')">
+        <RInput v-model="userInfo.username" :placeholder="t('login.usernameTip')">
+          <template #append>
+            <RIcon type="person-circle" />
+          </template>
+        </RInput>
+      </RFormItem>
+
+      <RFormItem :label="t('login.password')">
+        <RInput v-model="userInfo.password" type="password" :placeholder="t('login.passwordTip')" >
+          <template #append>
+            <RIcon type="lock" />
+          </template>
+        </RInput>
+      </RFormItem>
+
+      <RFormItem>
+        <RCheckbox v-model="rememberMe" :label="t('login.remember')" />
+      </RFormItem>
       
-      <RInput v-model="userInfo.username" :placeholder="t('login.usernameTip')"></RInput>
-      <RInput v-model="userInfo.password" type="password" :placeholder="t('login.passwordTip')"/>
-      <RButton @click="login"> {{ t('login.login') }} </RButton>
+      <RFormItem>
+      
+        <RButton @click="login"> {{ t('login.login') }} </RButton>
+      </RFormItem>
+
     </section>
   </section>
 

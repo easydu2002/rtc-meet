@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import 'uno.css'
 import i18n from './modules/i18n'
+import './components/iconfont.js'
 // document.body.append((() => {
 //    const tmp = document.createElement('div')
 //    tmp.innerHTML = `

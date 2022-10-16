@@ -6,7 +6,7 @@
   line-height: 24px;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* color-scheme: light dark; */
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -16,9 +16,9 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  --primary-color: #0065E2;
   --chat-bg-color-me: #ECF4FE;
   --chat-bg-color: #F5F5F5;
+  --color-primary: #0065E2;
   --color-regular: #666666;
   --color-regular-dark: #444444;
   --color-black: #333333;
@@ -41,7 +41,7 @@ a:hover {
   width: 100%;
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
     color: #213547;
     background-color: #ffffff;
