@@ -8,22 +8,22 @@ const {t} = useI18n()
 
 const navList = [
     {
-        icon: 'person-circle',
+        icon: 'bell',
         route: '/activity',
         label: t('home.nav.activity')
     },
     {
-        icon: 'person-circle',
+        icon: 'chat',
         route: '/chat',
         label: t('home.nav.chat')
     },
     {
-        icon: 'person-circle',
+        icon: 'meet',
         route: '/meet',
         label: t('home.nav.meet')
     },
     {
-        icon: 'person-circle',
+        icon: 'calendar',
         route: '/calender',
         label: t('home.nav.calender')
     },
@@ -48,8 +48,8 @@ const to = function(item: any) {
             cursor-pointer
             :active="current.route === item.route"
             @click="to(item)">
-          <RIcon type="person-circle" />
-          <span> {{ item.label }} </span>
+          <RIcon :type="item.icon" />
+          <span color-black> {{ item.label }} </span>
         </div>
 
       </nav>
@@ -58,7 +58,7 @@ const to = function(item: any) {
 <style>
 
 
-.navbar__item[active=true] {
+.navbar__item[active=true] span {
     color: var(--color-primary);
 }
 

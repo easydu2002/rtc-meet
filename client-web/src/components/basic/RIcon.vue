@@ -21,5 +21,6 @@
   vertical-align: -0.15em;
   fill: currentColor;
   overflow: hidden;
+  font-size: v-bind($props.size);
 }
 </style>

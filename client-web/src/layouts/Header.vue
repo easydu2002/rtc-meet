@@ -14,7 +14,7 @@ const {t} = useI18n()
 
     <RInput :placeholder="t('home.globalSearchTip')" width="500px">
       <template #append>
-        <RIcon type="person-circle" />
+        <RIcon type="search" />
       </template>
     </RInput>
   </header>

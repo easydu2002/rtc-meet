@@ -13,7 +13,11 @@ defineProps({
 
 <template>
 
-  <section class="r-button" :class="`r-button--${$props.type} r-button--${$props.size}`" rounded>
+  <section class="r-button" 
+    :class="`r-button--${$props.type} r-button--${$props.size}`" 
+    inline-block
+    rounded
+    flex items-center justify-center p-x-4>
     <slot />
   </section>
 

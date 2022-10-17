@@ -5,10 +5,11 @@
   font-size: 14px;
   line-height: 24px;
   font-weight: 400;
+  user-select: none;
 
   /* color-scheme: light dark; */
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -22,6 +23,7 @@
   --color-regular: #666666;
   --color-regular-dark: #444444;
   --color-black: #333333;
+  --color-ddd: #dddddd;
 }
 
 a {

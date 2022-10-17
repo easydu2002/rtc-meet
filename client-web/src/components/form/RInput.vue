@@ -17,13 +17,13 @@ defineProps({
 
   <section class="r-input" rounded-lg>
 
-    <div class="r-input__prepend" v-if="$slots.prepend">
+    <div class="r-input__prepend" v-if="$slots.prepend" flex items-center justify-center  p-l-8px>
       <slot name="prepend" />
     </div>
 
-    <input :type="$props.type" v-model="$props.modelValue" :placeholder="$props.placeholder">
+    <input :type="$props.type" v-model="$props.modelValue" :placeholder="$props.placeholder" w-0>
     
-    <div class="r-input__prepend" v-if="$slots.append" flex items-center justify-center p-x-8px>
+    <div class="r-input__prepend" v-if="$slots.append" flex items-center justify-center p-r-8px>
       <slot name="append" />
     </div>
   </section>

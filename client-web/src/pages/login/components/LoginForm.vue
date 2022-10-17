@@ -38,7 +38,7 @@ const login = function() {
   <section class="login-form">
 
     <section class="login-form__body">
-      <h1 text-42px>{{ t('login.title') }}</h1>
+      <h1 text-42px color-black>{{ t('login.title') }}</h1>
       <p text-14px color-regular m-b-20px>{{ t('login.subTitle') }}</p>
 
       <RFormItem :label="t('login.account')">

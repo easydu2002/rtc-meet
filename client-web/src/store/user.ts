@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 
 interface User {
+  id: number,
   username: string,
   token?: string
 }
@@ -12,5 +13,9 @@ interface UserStore {
 }
 
 export const theUserStore: UserStore = reactive({
-  isAuthenticated: true
+  isAuthenticated: true,
+  userInfo: {
+    id: 10000,
+    username: 'easydu',
+  }
 })
