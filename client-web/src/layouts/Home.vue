@@ -16,7 +16,7 @@ const { t } = useI18n()
 
     <Header />
 
-    <div flex flex-1 class="home__body">
+    <div flex flex-1 h0 class="home__body">
       
       <Navbar />
 

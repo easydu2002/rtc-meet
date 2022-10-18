@@ -17,7 +17,7 @@ defineProps({
     :class="`r-button--${$props.type} r-button--${$props.size}`" 
     inline-block
     rounded
-    flex items-center justify-center p-x-4>
+    flex items-center justify-center>
     <slot />
   </section>
 
@@ -40,6 +40,8 @@ defineProps({
   transition: opacity .25s;
   background-color: var(--r-button-bg-color);
   color: var(--r-button-text-color);
+
+  padding: 0 .25rem;
 }
 .r-button:hover {
   opacity: .8;
@@ -51,5 +53,10 @@ defineProps({
 .r-button--primary {
   --r-button-bg-color: var(--color-primary);
   --r-button-text-color: #fff;
+}
+.r-button--large {
+  height: 50px;
+  line-height: 50px;
+  padding: 0 1rem;
 }
 </style>

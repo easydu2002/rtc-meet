@@ -4,6 +4,9 @@ import RIcon from '../../../components/basic/RIcon.vue';
 import MessageItem from './components/MessageItem.vue';
 import RInput from '../../../components/form/RInput.vue';
 import RButton from '../../../components/basic/RButton.vue';
+import MessageContainer from './components/MessageContainer.vue';
+import MessageInput from './components/MessageInput.vue';
+import { getFriendsList } from '../../../api/user';
 
 /**
  */
@@ -11,6 +14,9 @@ import RButton from '../../../components/basic/RButton.vue';
 defineProps({
   id: String
 })
+
+console.log('getFriendsList()', getFriendsList());
+
 </script>
 
 
@@ -44,65 +50,17 @@ defineProps({
 
     </header>
 
-    <div flex-1 p-x-10px>
+    <section flex-1 p-x-10px flex h0>
       
       <div w-full max-w-760px m-x-auto 
         flex flex-col h-full>
         
-        <div flex-1>
-          <MessageItem :message="{
-            type: 'private',
-            subType: 'common',
-            data: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum.',
-            date: 1666000908807,
-            sender: {
-              userId: 100001
-            }
-          }" />
-          <MessageItem :message="{
-            type: 'private',
-            subType: 'common',
-            data: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum.',
-            date: 1666000908807,
-            sender: {
-              userId: 100001
-            }
-          }" />
-          <MessageItem :message="{
-            type: 'private',
-            subType: 'common',
-            data: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum.',
-            date: 1666000908807,
-            sender: {
-              userId: 10000
-            }
-          }" />
-        </div>
+        <MessageContainer />
 
-        <footer p-b-40px flex items-center>
-
-          <RInput shadow-md m-r-10px>
-            <template #append>
-              <RButton type="default">
-                  <RIcon type="attachment" size="1.5em" />
-              </RButton>
-              <RButton type="default">
-                  <RIcon type="emoji" size="1.5em" />
-              </RButton>
-              <RButton  type="default">
-                  <RIcon type="gif" size="1.5em" />
-              </RButton>
-            </template>
-          </RInput>
-
-          
-          <RButton>
-            <RIcon type="send" size="1.5em" />
-          </RButton>
-        </footer>
+        <MessageInput />
       </div>
 
-    </div>
+    </section>
   </section>
 
 </template>

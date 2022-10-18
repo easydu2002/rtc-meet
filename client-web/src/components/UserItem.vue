@@ -33,6 +33,10 @@ defineProps({
         py-0 px-4 
         text-12px leading-6>{{$props.tagLabel}}</span>
 
+       <span m-l-auto>
+        <slot name="append" />
+       </span>
+
     </section>
 
 </template>

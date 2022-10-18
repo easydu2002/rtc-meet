@@ -9,7 +9,8 @@ defineProps({
   icon: String,
   shape: { type: String, default:() => 'circle' || 'square' },
   size: { type: String, default:() => 'default' || 'large' || 'small' },
-  src: String
+  src: String,
+  state: String
 })
 
 </script>
@@ -17,11 +18,21 @@ defineProps({
 
 <template>
 
-  <section class="r-avatar" 
+  <section class="r-avatar"
     :class="`r-avatar--${$props.size} r-avatar--${$props.shape}`"
-    inline-block box-border p-1 bg-white>
+    inline-block relative box-border p-1 bg-white>
     <RIcon v-if="$props.icon" :type="$props.icon" />
     <img pointer-events-none v-else-if="$props.src" :src="$props.src" />
+
+    <span v-if="$props.state"
+      class="r-avatar--state"
+      box-border
+      w10px h10px
+      rounded-full
+      absolute right-0 bottom-0
+      border border-2 border-white
+      bg-green>
+    </span>
   </section>
 </template>
 

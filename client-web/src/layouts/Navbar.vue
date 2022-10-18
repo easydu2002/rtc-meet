@@ -1,24 +1,31 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 import RIcon from '../components/basic/RIcon.vue';
+import NavbarItem from './NavbarItem.vue';
 
 
 const {t} = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 const navList = [
     {
         icon: 'bell',
         route: '/activity',
+        fillbg: true,
         label: t('home.nav.activity')
     },
     {
         icon: 'chat',
+        activeIcon: 'chat-active',
         route: '/chat',
-        label: t('home.nav.chat')
+        label: t('home.nav.chat'),
     },
     {
         icon: 'meet',
+        activeIcon: 'meet-active',
         route: '/meet',
         label: t('home.nav.meet')
     },
@@ -29,11 +36,13 @@ const navList = [
     },
 ]
 
-const current = ref(navList[0])
+
+const current = ref(navList.find(item => item.route === route.path))
 
 const to = function(item: any) {
 
     current.value = item
+    router.push(item.route)
 }
 </script>
 
@@ -41,18 +50,15 @@ const to = function(item: any) {
     
     <nav w-70px class="navbar">
         
-        <div class="navbar__item" v-for="(item, key) in navList" :key="key"
-            relative
-            w70px h70px
-            flex flex-col items-center justify-center
-            cursor-pointer
+        <NavbarItem v-for="(item, key) in navList" :key="key" 
             :active="current.route === item.route"
-            @click="to(item)">
-          <RIcon :type="item.icon" />
-          <span color-black> {{ item.label }} </span>
-        </div>
+            :fill-background="item.fillbg"
+            :label="item.label"
+            :icon="item.icon"
+            :active-icon="item.activeIcon"
+            @click="to(item)" />
 
-      </nav>
+    </nav>
 </template>
 
 <style>

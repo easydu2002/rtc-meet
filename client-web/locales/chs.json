@@ -23,6 +23,10 @@
       "recent": "最近",
       "groups": "群组",
       "message": "消息"
+    },
+    "meet": {
+      
+      "start": "开始会议"
     }
   }
 }
