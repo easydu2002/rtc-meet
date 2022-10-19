@@ -21,8 +21,9 @@ defineProps({
       box-border
       h-42px px-10px
       cursor-pointer transition>
-          
-      <RAvatar :src="$props.imgSrc" size="small" border border-ddd />
+      
+      <slot name="prepend" v-if="$slots.prepend" />
+      <RAvatar v-else :src="$props.imgSrc" size="small" border border-ddd />
 
       <span class="block-item__label" m-l-8px color-regular>{{$props.label}}</span>
 

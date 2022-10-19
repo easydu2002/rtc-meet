@@ -2,24 +2,31 @@
 import UserItem from './UserItem.vue';
 import RIcon from './basic/RIcon.vue';
 
+defineProps({
+  expand: Boolean
+})
 </script>
 
 
 <template>
 
-  <section class="group-card" bg-gray-50 rounded-md>
+  <section class="group-card" bg-eee rounded-md>
 
-    <header bg-gray-300 rounded-t-inherit >
+    <header bg-eeee rounded-t-inherit >
 
-      <UserItem label="Office Group">
+      <UserItem avatarType="chat-active" label="Office Group">
 
+        <template #prepend>
+          <RIcon type="chat-active" />
+        </template>
         <template #append>
-          <RIcon type="attachment" />
+
+          <RIcon type="option" rotate-90 />
         </template>
       </UserItem>
     </header>
 
-    <div>
+    <div v-if="$props.expand">
 
       <UserItem  p-x-20px label="Office Group" />
       <UserItem  p-x-20px label="Office Group" />

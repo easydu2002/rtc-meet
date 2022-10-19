@@ -41,7 +41,7 @@ import GroupCard from '../../../components/GroupCard.vue';
       
       <Block :title="t('home.chat.groups')">
 
-        <GroupCard />
+        <GroupCard expand />
 
         <GroupCard />
         

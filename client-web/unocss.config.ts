@@ -10,7 +10,9 @@ export default defineConfig({
       'black': '#333333',
       'regular': '#666666',
       'ddd': 'var(--color-ddd)',
-      'primary': 'var(--color-primary)'
+      'primary': 'var(--color-primary)',
+      'eeee': 'var(--color-E4E4E4)',
+      'eee': 'var(--color-eee)',
     }
   },
   presets: [
