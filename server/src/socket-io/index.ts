@@ -1,8 +1,8 @@
-import { log } from './../util/log';
-import { Server } from "socket.io"
+import { log } from './../util/log'
+import { Server } from 'socket.io'
 import http from 'http'
 import https from 'https'
-import { Http2SecureServer } from "http2"
+import { Http2SecureServer } from 'http2'
 
 interface ClientToServerEvents {
 
@@ -13,29 +13,21 @@ interface ServerToClientEvents {
 
 }
 interface InterServerEvents {
-  ping: () => void;
+  ping: () => void
 }
 
 interface SocketData {
-  name: string;
-  age: number;
+  name: string
+  age: number
 }
 
-
-
-export const createSocketServer = function(srv?: http.Server | https.Server | Http2SecureServer | number) {
-
-  
+export const createSocketServer = function (srv?: http.Server | https.Server | Http2SecureServer | number) {
   const socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(srv)
 
   socketServer.on('connection', (socket) => {
-
     log('socket.io:connection')
 
-    // @ts-ignore
+    // @ts-expect-error
     socket.send('hello')
   })
-
-
-
 }

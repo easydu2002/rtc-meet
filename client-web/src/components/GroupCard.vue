@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import UserItem from './UserItem.vue';
 import RIcon from './basic/RIcon.vue';
+import { ref } from 'vue';
 
-defineProps({
-  expand: Boolean
-})
+const expand = ref(false)
+
 </script>
 
 
@@ -12,21 +12,21 @@ defineProps({
 
   <section class="group-card" bg-eee rounded-md>
 
-    <header bg-eeee rounded-t-inherit >
+    <header bg-eeee rounded-t-inherit :class="!expand ? 'rounded-inherit': ''" @click="expand = !expand">
 
       <UserItem avatarType="chat-active" label="Office Group">
 
         <template #prepend>
-          <RIcon type="chat-active" />
+          <RIcon type="chat-right-dots" size="1.2em" />
         </template>
         <template #append>
 
-          <RIcon type="option" rotate-90 />
+          <RIcon type="option-icon" size="1.5em" />
         </template>
       </UserItem>
     </header>
 
-    <div v-if="$props.expand">
+    <div v-if="expand">
 
       <UserItem  p-x-20px label="Office Group" />
       <UserItem  p-x-20px label="Office Group" />
