@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "ts-node src/index.ts",
-    "lint": "eslint . --fix"
+    "lint": "eslint --fix src --ext .ts"
   },
   "author": "",
   "license": "ISC",

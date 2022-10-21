@@ -2,7 +2,6 @@ import { log } from './../util/log'
 import { generateToken, validateToken } from './../util/token'
 import { Model, model, Schema } from 'mongoose'
 import { encodePassword, validatePassword } from '../util/password'
-import config from '../../config'
 import { generateRandomAvatar } from '../util/user'
 
 interface IUser {
@@ -23,10 +22,11 @@ interface IFriend {
 
 }
 
-export const Friend = new Schema({
+export const Friend = new Schema<IFriend>({
 
   username: String,
-  nickname: String
+  nickname: String,
+  avatar: String
 
 })
 
@@ -93,13 +93,14 @@ User.methods.login = async (username, password) => {
   return {
     id: user._id.toString(),
     username: user.username,
+    password: '',
     token: user.token,
     friends: user.friends,
     avatar: user.avatar
   }
 }
 
-User.methods.validate = async function (token): boolean {
+User.methods.validate = async function (token): Promise<boolean> {
   const payload = validateToken(token)
   if (!payload) {
     return false
@@ -107,7 +108,7 @@ User.methods.validate = async function (token): boolean {
 
   const user = await UserModel.findOne({ username: payload.username })
 
-  if(!user) return false
+  if (user == null) return false
 
   if (user.token !== token) {
     return false
@@ -118,18 +119,20 @@ User.methods.validate = async function (token): boolean {
   return true
 }
 
-User.methods.getFriendList = async function (userId) {
+User.methods.getFriendList = async function (userId: string): Promise<IUser[]> {
   const user = await UserModel.findById(userId)
-  return user.friends
+  return user?.friends ?? []
 }
 
 User.methods.addFriend = async function (userId, friendId) {
   try {
     const user = await UserModel.findById(userId)
+    if (user == null) return false
     const friend = await UserModel.findById(friendId)
+    if (friend == null) return false
 
-    user.friends.push(friend)
-    friend.friends.push(friend)
+    user?.friends?.push(friend)
+    friend?.friends?.push(friend)
 
     await Promise.all([user.save(), friend.save()])
 
@@ -140,10 +143,15 @@ User.methods.addFriend = async function (userId, friendId) {
   }
 }
 
-User.methods.removeFriend = async function (userId, friendId) {
+User.methods.removeFriend = async function (userId, friendId): Promise<boolean> {
   try {
     const user = await UserModel.findById(userId)
+
+    if ((user == null) || (user.friends == null)) return false
+
     const friend = await UserModel.findById(friendId)
+
+    if ((friend == null) || (friend.friends == null)) return false
 
     user.friends.splice(user.friends.findIndex(item => item.username === friend.username), 1)
     friend.friends.splice(friend.friends.findIndex(item => item.username === user.username), 1)

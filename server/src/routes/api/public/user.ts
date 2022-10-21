@@ -1,7 +1,8 @@
 import { Router } from 'express'
 
-export const bindUserRouter = function (router: Router) {
-  router.get('/user/friends/:id', (res, req) => {
-    req.send(res.params)
-  })
-}
+const userRouter = Router()
+userRouter.get('/user/friends/:id', (res, req) => {
+  req.send(res.params)
+})
+
+export const bindUserRouter = (router: Router): Router => router.use(userRouter)

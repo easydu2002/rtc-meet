@@ -1,3 +1,4 @@
+import { response, ResponseType } from './../../../util/response'
 import { Router } from 'express'
 import UserModel from '../../../model/user'
 
@@ -8,17 +9,25 @@ interface AuthData {
 
 }
 
-export const bindAuthRouter = function (router: Router) {
-  router.post('/authentication', (req, res) => {
-    const data = req.body as AuthData
-    res.send(data)
-  })
+const authRouter = Router()
 
-  router.post('/login', async (req, res) => {
-    const data = req.body as AuthData
+authRouter.post('/authentication', (req, res) => {
+  const data = req.body as AuthData
+  res.send(data)
+})
 
-    const model = new UserModel()
+authRouter.post('/login', (req, res) => {
+  const data = req.body as AuthData
 
-    model.login(data.username, data.password)
-  })
-}
+  const model = new UserModel()
+
+  model.login(data.username, data.password)
+    .then((userInfo) => {
+      response(res).send(ResponseType.SUCCESS, userInfo)
+    })
+    .catch(() => {
+
+    })
+})
+
+export const bindAuthRouter = (router: Router): Router => router.use(authRouter)
