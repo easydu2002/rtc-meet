@@ -12,6 +12,8 @@ export default {
 
   // https://www.npmjs.com/package/jsonwebtoken
   token: {
+    requestHeader: 'Authorization',
+    responseHeader: 'refresh-token',
     autoExtension: true,
     secretOrPrivateKey: Math.random().toString(36) + Math.random().toString(36) + Math.random().toString(36),
     expiresIn: '24h'

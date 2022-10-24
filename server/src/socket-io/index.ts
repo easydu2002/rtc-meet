@@ -21,13 +21,20 @@ interface SocketData {
   age: number
 }
 
-export const createSocketServer = function (srv?: http.Server | https.Server | Http2SecureServer | number) {
-  const socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(srv)
+let socketInstance: Server
 
-  socketServer.on('connection', (socket) => {
+export const createSocketServer = function (srv?: http.Server | https.Server | Http2SecureServer | number) {
+  if (socketInstance) return socketInstance
+
+  socketInstance = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(srv)
+
+  socketInstance.on('connection', (socket) => {
     log('socket.io:connection')
 
-    // @ts-expect-error
     socket.send('hello')
   })
+  return socketInstance
+}
+
+export const stopSocket = function (username: string) {
 }

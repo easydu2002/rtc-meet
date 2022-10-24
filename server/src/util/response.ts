@@ -17,7 +17,7 @@ export const response = function (res: Response) {
     send: (type: ResponseType, data: any, msg?: string) => {
       msg = msg ?? responseMessageMapping.get(type)
       res.statusCode = type
-      res.send({
+      res.json({
         code: type,
         msg,
         data

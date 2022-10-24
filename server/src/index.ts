@@ -5,13 +5,16 @@ import { connect } from 'mongoose'
 import config from '../config'
 import path from 'path'
 
+// const startTime: number = Date.now()
 const staticPath = path.join(__dirname, '../public')
 
 connect(config.mongo.connectUrl)
   .then(() => {
-    log('loaded mongodb...')
+    log('connected to ' + config.mongo.connectUrl)
     const server = createHTTPServer({ staticPath })
     createSocketServer(server)
+
+    // log('start success, use ', (Date.now() - startTime), 'ms')
   })
   .catch(err => {
     log(err)

@@ -1,8 +1,10 @@
+import { ResponseType } from './../util/response'
 import { log } from './../util/log'
 import { generateToken, validateToken } from './../util/token'
 import { Model, model, Schema } from 'mongoose'
 import { encodePassword, validatePassword } from '../util/password'
 import { generateRandomAvatar } from '../util/user'
+import config from '../../config'
 
 interface IUser {
   id?: string
@@ -34,11 +36,11 @@ export const User = new Schema<IUser, Model<IUser>, {
   /**
    * 登录，（不存在自动注册）
    */
-  login: (username: string, password: string) => Promise<IUser | false>
+  login: (username: string, password: string) => Promise<IUser>
   /**
    * 校验token，并根据配置决定是否续签
    */
-  validate: (token: string) => Promise<boolean>
+  validateToken: (token: string) => Promise<string>
 
   /**
    * 获取好友列表
@@ -67,13 +69,14 @@ User.methods.login = async (username, password) => {
 
   if (user != null) {
     if (!validatePassword(user.password, password)) {
-      return false
+      throw Error('账户名或密码错误!')
     }
 
     // 重新登录覆盖旧token
     const token = generateToken({ username })
 
     await user.updateOne({ token })
+    user.token = token
   } else {
     const token = generateToken({ username })
 
@@ -93,30 +96,40 @@ User.methods.login = async (username, password) => {
   return {
     id: user._id.toString(),
     username: user.username,
-    password: '',
+    password: '******',
     token: user.token,
     friends: user.friends,
     avatar: user.avatar
   }
 }
 
-User.methods.validate = async function (token): Promise<boolean> {
+User.methods.validateToken = async function (token: string) {
   const payload = validateToken(token)
   if (!payload) {
-    return false
+    throw Error('未登录!')
   }
 
   const user = await UserModel.findOne({ username: payload.username })
 
-  if (user == null) return false
-
-  if (user.token !== token) {
-    return false
+  if (user == null) {
+    throw Error('该账号不存在!')
   }
 
-  // if (config.token.autoExtension) {}
+  if (user.token !== token) {
+    throw Error('账号在别处登录!')
+  }
 
-  return true
+  if (config.token.autoExtension) {
+    const totalSecond = payload.exp - payload.iat
+    const freeSecond = payload.exp - (Date.now() / 1000)
+    if (freeSecond < (totalSecond / 10)) {
+      const newToken = generateToken({ username: payload.username })
+      await user.updateOne({ token: newToken })
+      return newToken
+    }
+  }
+
+  return token
 }
 
 User.methods.getFriendList = async function (userId: string): Promise<IUser[]> {

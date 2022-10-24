@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 const userRouter = Router()
+
 userRouter.get('/user/friends/:id', (res, req) => {
   req.send(res.params)
 })
