@@ -21,9 +21,7 @@ authRouter.post('/authentication', (req, res) => {
 authRouter.post('/login', (req, res, next) => {
   const data = req.body as AuthData
 
-  const model = new UserModel()
-
-  model.login(data.username, data.password)
+  UserModel.login(data.username, data.password)
     .then((userInfo) => {
       if (userInfo.token) {
         res.setHeader(config.token.responseHeader, userInfo.token)

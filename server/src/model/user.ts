@@ -1,70 +1,62 @@
-import { ResponseType } from './../util/response'
 import { log } from './../util/log'
+import GroupModel, { IGroup } from './group'
 import { generateToken, validateToken } from './../util/token'
 import { Model, model, Schema } from 'mongoose'
 import { encodePassword, validatePassword } from '../util/password'
 import { generateRandomAvatar } from '../util/user'
 import config from '../../config'
+import { userToFriend } from '../util/model'
+import CounterModel from './counter'
 
-interface IUser {
-  id?: string
+export interface IUser {
+  id: number
+  _id?: number
   username: string
   password: string
   token?: string
   avatar?: string
-  friends?: IUser[]
+  friends: IFriend[]
+  groupIds: number[]
 }
 
-interface IFriend {
+export interface IFriend {
 
-  id?: string
-  username?: string
+  id: number
+  username: string
   nickname?: string
   avatar?: string
 
 }
 
-export const Friend = new Schema<IFriend>({
-
-  username: String,
-  nickname: String,
-  avatar: String
-
-})
-
-export const User = new Schema<IUser, Model<IUser>, {
-  /**
-   * 登录，（不存在自动注册）
-   */
+interface IUserModel extends Model<IUser> {
   login: (username: string, password: string) => Promise<IUser>
+
   /**
-   * 校验token，并根据配置决定是否续签
-   */
+    * 校验token，并根据配置决定是否续签
+    */
   validateToken: (token: string) => Promise<string>
 
-  /**
-   * 获取好友列表
-   */
-  getFriendList: (userId: string) => Promise<IUser[]>
+  getUserVO: (id: number) => Promise<IUser>
 
-  /**
-   * 添加好友
-   */
-  addFriend: (userId: string, friendId: string) => Promise<boolean>
+  addFriend: (userId: number, friendId: number) => Promise<IUser>
 
-  /**
-   * 删除好友
-   */
-  removeFriend: (userId: string, friendId: string) => Promise<boolean> }>({
-      id: Number,
-      username: { type: String, required: true, unique: true },
-      password: { type: String, required: true },
-      token: String,
-      avatar: String,
-      friends: [Friend]
-    })
+  removeFriend: (userId: number, friendId: number) => Promise<boolean>
 
-User.methods.login = async (username, password) => {
+  joinGroup: (userId: number, groupId: number) => Promise<IGroup>
+
+  exitGroup: (userId: number, groupId: number) => Promise<boolean>
+}
+
+export const User = new Schema<IUser, Model<IUser>, {}>({
+  _id: Number,
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  token: String,
+  avatar: String,
+  friends: []
+}, { _id: false })
+
+User.statics.login = async function (username, password) {
   let user = await UserModel.findOne({ username })
 
   if (user != null) {
@@ -73,18 +65,21 @@ User.methods.login = async (username, password) => {
     }
 
     // 重新登录覆盖旧token
-    const token = generateToken({ username })
+    const token = generateToken({ username, userId: user.id })
 
     await user.updateOne({ token })
     user.token = token
   } else {
-    const token = generateToken({ username })
+    const userId = await CounterModel.getNextSequenceValue('user')
+    const token = generateToken({ username, userId })
 
     user = new UserModel({
+      _id: userId,
       username,
       password: encodePassword(password),
       token,
-      avatar: generateRandomAvatar()
+      avatar: generateRandomAvatar(),
+      friends: []
     })
 
     // const err = user.validateSync()
@@ -93,17 +88,10 @@ User.methods.login = async (username, password) => {
     await user.save()
   }
 
-  return {
-    id: user._id.toString(),
-    username: user.username,
-    password: '******',
-    token: user.token,
-    friends: user.friends,
-    avatar: user.avatar
-  }
+  return user
 }
 
-User.methods.validateToken = async function (token: string) {
+User.statics.validateToken = async function (token: string) {
   const payload = validateToken(token)
   if (!payload) {
     throw Error('未登录!')
@@ -111,19 +99,19 @@ User.methods.validateToken = async function (token: string) {
 
   const user = await UserModel.findOne({ username: payload.username })
 
-  if (user == null) {
+  if (!user) {
     throw Error('该账号不存在!')
   }
 
   if (user.token !== token) {
-    throw Error('账号在别处登录!')
+    throw Error('登录失效或在别处登录!')
   }
 
   if (config.token.autoExtension) {
     const totalSecond = payload.exp - payload.iat
     const freeSecond = payload.exp - (Date.now() / 1000)
     if (freeSecond < (totalSecond / 10)) {
-      const newToken = generateToken({ username: payload.username })
+      const newToken = generateToken({ username: payload.username, userId: payload.userId })
       await user.updateOne({ token: newToken })
       return newToken
     }
@@ -132,51 +120,78 @@ User.methods.validateToken = async function (token: string) {
   return token
 }
 
-User.methods.getFriendList = async function (userId: string): Promise<IUser[]> {
+User.statics.addFriend = async function (userId, friendId): Promise<IUser> {
   const user = await UserModel.findById(userId)
-  return user?.friends ?? []
-}
-
-User.methods.addFriend = async function (userId, friendId) {
-  try {
-    const user = await UserModel.findById(userId)
-    if (user == null) return false
-    const friend = await UserModel.findById(friendId)
-    if (friend == null) return false
-
-    user?.friends?.push(friend)
-    friend?.friends?.push(friend)
-
-    await Promise.all([user.save(), friend.save()])
-
-    return true
-  } catch (err) {
-    log(err)
-    return false
+  if (!user) {
+    throw Error('账户不存在!')
   }
-}
-
-User.methods.removeFriend = async function (userId, friendId): Promise<boolean> {
-  try {
-    const user = await UserModel.findById(userId)
-
-    if ((user == null) || (user.friends == null)) return false
-
-    const friend = await UserModel.findById(friendId)
-
-    if ((friend == null) || (friend.friends == null)) return false
-
-    user.friends.splice(user.friends.findIndex(item => item.username === friend.username), 1)
-    friend.friends.splice(friend.friends.findIndex(item => item.username === user.username), 1)
-
-    await Promise.all([user.save(), friend.save()])
-
-    return true
-  } catch (err) {
-    return false
+  const friend = await UserModel.findById(friendId)
+  if (!friend) {
+    throw Error('账户不存在!')
   }
+
+  user.friends.push(friend)
+  friend.friends.push(friend)
+
+  await Promise.all([user.save(), friend.save()])
+  return user
 }
 
-const UserModel = model('user', User)
+User.statics.removeFriend = async function (userId, friendId): Promise<boolean> {
+  const user = await UserModel.findById(userId)
+  if (!user) {
+    throw Error('账户不存在!')
+  }
+
+  const userFriendIndex = user.friends.findIndex(item => item.id === friendId)
+  if (!user.friends.length || userFriendIndex === -1) {
+    throw Error('用户不存在该好友!')
+  }
+
+  const friend = await UserModel.findById(friendId)
+  if (!friend) {
+    throw Error('账户不存在!')
+  }
+  const friendUserIndex = friend.friends.findIndex(item => item.id === user.id)
+
+  user.friends.splice(userFriendIndex, 1)
+  friend.friends.splice(friendUserIndex, 1)
+
+  return await Promise.all([user.save(), friend.save()])
+    .then(([userResult, friendResult]) => {
+      return userResult === user && friend === friendResult
+    })
+    .catch((err) => {
+      log(err)
+      return false
+    })
+}
+
+User.statics.joinGroup = async function (userId: number, groupId: number): Promise<IGroup> {
+  const user = await UserModel.findById(userId)
+  if (!user) {
+    throw Error('该用户不存在!')
+  }
+  if (user.groupIds.includes(groupId)) {
+    throw Error('用户已在该群中!')
+  }
+  const group = await GroupModel.findById(groupId)
+  if (!group) {
+    throw Error('该群组不存在!')
+  }
+
+  group.members.push(userToFriend(user))
+  user.groupIds.push(groupId)
+
+  return await Promise.all([group.save(), user.save()])
+    .then(() => {
+      return group
+    })
+    .catch((err) => {
+      throw Error(err)
+    })
+}
+
+const UserModel = model<IUser, IUserModel>('user', User)
 
 export default UserModel

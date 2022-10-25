@@ -4,6 +4,7 @@ import config from '../../config'
 
 interface CustomPayload {
   username: string
+  userId: number
 }
 
 interface Payload extends CustomPayload {

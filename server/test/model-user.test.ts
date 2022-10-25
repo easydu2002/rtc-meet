@@ -8,8 +8,7 @@ beforeAll(async () => {
 })
 
 test('login', async () => {
-  const userModel = new UserModel()
-  const result = await userModel.login('test001', 'qingsong123456')
+  const result = await UserModel.login('test001', 'qingsong123456')
   log(result)
 })
 

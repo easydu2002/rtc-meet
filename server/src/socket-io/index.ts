@@ -32,6 +32,10 @@ export const createSocketServer = function (srv?: http.Server | https.Server | H
     log('socket.io:connection')
 
     socket.send('hello')
+
+    socket.on('message', (e) => {
+      // e.
+    })
   })
   return socketInstance
 }

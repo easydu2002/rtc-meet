@@ -14,7 +14,7 @@ module.exports = {
   rules: {
     indent: ['error', 2],
     '@typescript-eslint/strict-boolean-expressions': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'warn',
     '@typescript-eslint/no-empty-interface': 'off'
   }
 }

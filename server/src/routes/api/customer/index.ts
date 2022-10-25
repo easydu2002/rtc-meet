@@ -1,8 +1,8 @@
-import { log } from './../../../util/log'
 import { Router } from 'express'
 import config from '../../../../config'
 import { response, ResponseType } from '../../../util/response'
 import UserModel from '../../../model/user'
+import userRouter from './user'
 
 const customerRouter = Router()
 
@@ -11,8 +11,7 @@ customerRouter.use((req, res, next) => {
   if (!token) {
     return res.status(401).json({ err: 'Unauthorized' })
   }
-  const userModel = new UserModel()
-  userModel.validateToken(token)
+  UserModel.validateToken(token)
     .then((token) => {
       res.setHeader(config.token.responseHeader, token)
       next()
@@ -25,5 +24,7 @@ customerRouter.use((req, res, next) => {
 customerRouter.use('/', (req, res) => {
   response(res).send(ResponseType.SUCCESS, undefined, '用户API')
 })
+
+customerRouter.use(userRouter)
 
 export default customerRouter
