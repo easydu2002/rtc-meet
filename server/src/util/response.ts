@@ -1,4 +1,5 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
+import { QueryUserIdKey } from '../common/contant'
 
 const responseMessageMapping: Map<ResponseType, string> = new Map()
 
@@ -14,7 +15,7 @@ responseMessageMapping.set(ResponseType.USER_Authorization_ERROR, '没有权限!
 
 export const response = function (res: Response) {
   return {
-    send: (type: ResponseType, data: any, msg?: string) => {
+    send: (type: ResponseType, data?: any, msg?: string) => {
       msg = msg ?? responseMessageMapping.get(type)
       res.statusCode = type
       res.json({
@@ -24,4 +25,16 @@ export const response = function (res: Response) {
       })
     }
   }
+}
+
+export const errHandler = function (res: Response, err: Error) {
+  response(res).send(ResponseType.SUCCESS, err.message)
+}
+
+export const setUserIDToRequest = function (userId: number, request: Request): void {
+  request.query[QueryUserIdKey] = String(userId)
+}
+
+export const getUserIDFromRequest = function (request: Request): number | undefined {
+  return Number(request.query[QueryUserIdKey]) || undefined
 }

@@ -1,13 +1,10 @@
-import { IFriend } from './user'
 import { Model, model, Schema } from 'mongoose'
-
-interface IMember extends IFriend { }
 
 export interface IGroup {
   id: number
   name: string
-  adminid: number
-  members: IMember[]
+  adminId: number
+  members: number[]
 }
 
 interface IGroupModel extends Model<IGroup, {}, {}> {
@@ -18,7 +15,7 @@ interface IGroupModel extends Model<IGroup, {}, {}> {
 const Group = new Schema<IGroup, IGroupModel, {}>({
 
   name: { type: String, required: true },
-  members: []
+  members: { type: [], default: [] }
 
 })
 

@@ -4,6 +4,10 @@ import customerRouter from './customer'
 import publicRouter from './public'
 
 export const api = (server: Express): Express => {
+  // server.use((err, req, res, next) => {
+  //   log('>>>>>>>>>>>>11.')
+  //   response(res).send(err.message)
+  // })
   server.use('/api/v1/public', publicRouter)
   log('use route: ', '/api/v1/public')
 

@@ -1,11 +1,10 @@
 import { log } from './../util/log'
 import GroupModel, { IGroup } from './group'
-import { generateToken, validateToken } from './../util/token'
+import { CustomPayload, generateToken, validateToken } from './../util/token'
 import { Model, model, Schema } from 'mongoose'
 import { encodePassword, validatePassword } from '../util/password'
 import { generateRandomAvatar } from '../util/user'
 import config from '../../config'
-import { userToFriend } from '../util/model'
 import CounterModel from './counter'
 
 export interface IUser {
@@ -15,17 +14,8 @@ export interface IUser {
   password: string
   token?: string
   avatar?: string
-  friends: IFriend[]
+  friendIds: number[]
   groupIds: number[]
-}
-
-export interface IFriend {
-
-  id: number
-  username: string
-  nickname?: string
-  avatar?: string
-
 }
 
 interface IUserModel extends Model<IUser> {
@@ -34,7 +24,7 @@ interface IUserModel extends Model<IUser> {
   /**
     * 校验token，并根据配置决定是否续签
     */
-  validateToken: (token: string) => Promise<string>
+  validateToken: (token: string) => Promise<{ token: string, payload: CustomPayload }>
 
   getUserVO: (id: number) => Promise<IUser>
 
@@ -53,7 +43,8 @@ export const User = new Schema<IUser, Model<IUser>, {}>({
   password: { type: String, required: true },
   token: String,
   avatar: String,
-  friends: []
+  friendIds: { type: [], default: [] },
+  groupIds: { type: [], default: [] }
 }, { _id: false })
 
 User.statics.login = async function (username, password) {
@@ -107,7 +98,7 @@ User.statics.validateToken = async function (token: string) {
     throw Error('登录失效或在别处登录!')
   }
 
-  if (config.token.autoExtension) {
+  if (config.token.autoExtension && payload.exp && payload.iat) {
     const totalSecond = payload.exp - payload.iat
     const freeSecond = payload.exp - (Date.now() / 1000)
     if (freeSecond < (totalSecond / 10)) {
@@ -117,34 +108,46 @@ User.statics.validateToken = async function (token: string) {
     }
   }
 
-  return token
+  return {
+    token,
+    payload
+  }
 }
 
 User.statics.addFriend = async function (userId, friendId): Promise<IUser> {
+  if (userId === friendId) {
+    throw Error('参数错误, id不能一样!')
+  }
   const user = await UserModel.findById(userId)
   if (!user) {
     throw Error('账户不存在!')
+  }
+  if (user.friendIds.includes(friendId)) {
+    throw Error('已存在该好友!')
   }
   const friend = await UserModel.findById(friendId)
   if (!friend) {
     throw Error('账户不存在!')
   }
 
-  user.friends.push(friend)
-  friend.friends.push(friend)
+  user.friendIds.push(friendId)
+  friend.friendIds.push(userId)
 
   await Promise.all([user.save(), friend.save()])
   return user
 }
 
 User.statics.removeFriend = async function (userId, friendId): Promise<boolean> {
+  if (userId === friendId) {
+    throw Error('参数错误, id不能一样!')
+  }
   const user = await UserModel.findById(userId)
   if (!user) {
     throw Error('账户不存在!')
   }
 
-  const userFriendIndex = user.friends.findIndex(item => item.id === friendId)
-  if (!user.friends.length || userFriendIndex === -1) {
+  const userFriendIndex = user.friendIds.findIndex(item => item === friendId)
+  if (!user.friendIds.length || userFriendIndex === -1) {
     throw Error('用户不存在该好友!')
   }
 
@@ -152,10 +155,10 @@ User.statics.removeFriend = async function (userId, friendId): Promise<boolean> 
   if (!friend) {
     throw Error('账户不存在!')
   }
-  const friendUserIndex = friend.friends.findIndex(item => item.id === user.id)
+  const friendUserIndex = friend.friendIds.findIndex(item => item === userId)
 
-  user.friends.splice(userFriendIndex, 1)
-  friend.friends.splice(friendUserIndex, 1)
+  user.friendIds.splice(userFriendIndex, 1)
+  friend.friendIds.splice(friendUserIndex, 1)
 
   return await Promise.all([user.save(), friend.save()])
     .then(([userResult, friendResult]) => {
@@ -180,7 +183,7 @@ User.statics.joinGroup = async function (userId: number, groupId: number): Promi
     throw Error('该群组不存在!')
   }
 
-  group.members.push(userToFriend(user))
+  group.members.push(userId)
   user.groupIds.push(groupId)
 
   return await Promise.all([group.save(), user.save()])

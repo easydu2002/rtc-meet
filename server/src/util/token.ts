@@ -1,15 +1,10 @@
 import { log } from './log'
-import { sign, verify } from 'jsonwebtoken'
+import { sign, verify, JwtPayload } from 'jsonwebtoken'
 import config from '../../config'
 
-interface CustomPayload {
+export interface CustomPayload extends JwtPayload {
   username: string
   userId: number
-}
-
-interface Payload extends CustomPayload {
-  iat: number
-  exp: number
 }
 
 export const generateToken = function (payload: CustomPayload) {
@@ -22,9 +17,9 @@ export const generateToken = function (payload: CustomPayload) {
   return sign(payload, key, options)
 }
 
-export const validateToken = function (token: string): Payload | false {
+export const validateToken = function (token: string): CustomPayload | false {
   try {
-    return verify(token, config.token.secretOrPrivateKey) as Payload
+    return verify(token, config.token.secretOrPrivateKey) as CustomPayload
   } catch (err) {
     log(err)
     return false
