@@ -11,6 +11,12 @@ userRouter.get('/user/:id', (req, res) => {
     .catch(err => errHandler(res, err))
 })
 
+userRouter.get('/user/:current/:size/:keywords', (req, res) => {
+  UserModel.search(req.params.keywords, { current: Number(req.params.current), size: Number(req.params.size) })
+    .then((list) => response(res).sendData(list))
+    .catch(err => errHandler(res, err))
+})
+
 userRouter.post('/friend/:friendId', (req, res) => {
   const userId = getUserIDFromRequest(req)
   UserModel.addFriend(Number(userId), Number(req.params.friendId))
@@ -26,20 +32,6 @@ userRouter.delete('/friend/:friendId', (req, res, next) => {
     .then(() => {
       response(res).send(ResponseType.SUCCESS, undefined, '删除成功')
     })
-    .catch(err => errHandler(res, err))
-})
-
-userRouter.post('/group/:groupId', (req, res) => {
-  const userId = getUserIDFromRequest(req)
-  UserModel.joinGroup(Number(userId), Number(req.params.groupId))
-    .then(() => {})
-    .catch(err => errHandler(res, err))
-})
-
-userRouter.delete('/group/:groupId', (req, res) => {
-  const userId = getUserIDFromRequest(req)
-  UserModel.exitGroup(Number(userId), Number(req.params.groupId))
-    .then(() => {})
     .catch(err => errHandler(res, err))
 })
 

@@ -23,6 +23,12 @@ export const response = function (res: Response) {
         msg,
         data
       })
+    },
+    sendData: (data: any) => {
+      res.json({
+        code: ResponseType.SUCCESS,
+        data
+      })
     }
   }
 }
@@ -35,6 +41,6 @@ export const setUserIDToRequest = function (userId: number, request: Request): v
   request.query[QueryUserIdKey] = String(userId)
 }
 
-export const getUserIDFromRequest = function (request: Request): number | undefined {
-  return Number(request.query[QueryUserIdKey]) || undefined
+export const getUserIDFromRequest = function (request: Request): number | 0 {
+  return Number(request.query[QueryUserIdKey])
 }

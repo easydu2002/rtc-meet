@@ -4,6 +4,7 @@ import config from '../../../../config'
 import { response, ResponseType, setUserIDToRequest } from '../../../util/response'
 import UserModel from '../../../model/user'
 import userRouter from './user'
+import groupRouter from './group'
 
 const customerRouter = Router()
 
@@ -28,5 +29,6 @@ customerRouter.get('/', (req, res) => {
 })
 
 customerRouter.use(userRouter)
+customerRouter.use(groupRouter)
 
 export default customerRouter

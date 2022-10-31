@@ -1,5 +1,4 @@
 import { log } from './../util/log'
-import GroupModel, { IGroup } from './group'
 import { CustomPayload, generateToken, validateToken } from './../util/token'
 import { Model, model, Schema } from 'mongoose'
 import { encodePassword, validatePassword } from '../util/password'
@@ -32,9 +31,8 @@ interface IUserModel extends Model<IUser> {
 
   removeFriend: (userId: number, friendId: number) => Promise<boolean>
 
-  joinGroup: (userId: number, groupId: number) => Promise<IGroup>
+  search: (keywords: string, page: { current: number, size: number }) => Promise<IUser[]>
 
-  exitGroup: (userId: number, groupId: number) => Promise<boolean>
 }
 
 export const User = new Schema<IUser, Model<IUser>, {}>({
@@ -114,6 +112,15 @@ User.statics.validateToken = async function (token: string) {
   }
 }
 
+User.statics.search = async function (keywords: string, page: { current: number, size: number }): Promise<IUser[]> {
+  const userId = Number(keywords)
+  const filter = userId ? { $or: [{ _id: parseInt(keywords) }, { username: { $regex: keywords } }] } : { username: { $regex: keywords } }
+
+  return await UserModel.find(filter)
+    .skip((page.current - 1) * page.size)
+    .limit(page.size)
+}
+
 User.statics.addFriend = async function (userId, friendId): Promise<IUser> {
   if (userId === friendId) {
     throw Error('参数错误, id不能一样!')
@@ -130,11 +137,12 @@ User.statics.addFriend = async function (userId, friendId): Promise<IUser> {
     throw Error('账户不存在!')
   }
 
-  user.friendIds.push(friendId)
-  friend.friendIds.push(userId)
+  const task = [
+    user.updateOne({ $push: { friendIds: friendId } }),
+    friend.updateOne({ $push: { friendIds: userId } })
+  ]
 
-  await Promise.all([user.save(), friend.save()])
-  return user
+  return (await Promise.all(task))[0]
 }
 
 User.statics.removeFriend = async function (userId, friendId): Promise<boolean> {
@@ -146,8 +154,7 @@ User.statics.removeFriend = async function (userId, friendId): Promise<boolean> 
     throw Error('账户不存在!')
   }
 
-  const userFriendIndex = user.friendIds.findIndex(item => item === friendId)
-  if (!user.friendIds.length || userFriendIndex === -1) {
+  if (!user.friendIds.includes(friendId)) {
     throw Error('用户不存在该好友!')
   }
 
@@ -155,43 +162,19 @@ User.statics.removeFriend = async function (userId, friendId): Promise<boolean> 
   if (!friend) {
     throw Error('账户不存在!')
   }
-  const friendUserIndex = friend.friendIds.findIndex(item => item === userId)
 
-  user.friendIds.splice(userFriendIndex, 1)
-  friend.friendIds.splice(friendUserIndex, 1)
+  const task = [
+    await user.updateOne({ $pull: { friendIds: { $in: [friendId] } } }),
+    await friend.updateOne({ $pull: { friendIds: { $in: [userId] } } })
+  ]
 
-  return await Promise.all([user.save(), friend.save()])
+  return await Promise.all(task)
     .then(([userResult, friendResult]) => {
       return userResult === user && friend === friendResult
     })
     .catch((err) => {
       log(err)
       return false
-    })
-}
-
-User.statics.joinGroup = async function (userId: number, groupId: number): Promise<IGroup> {
-  const user = await UserModel.findById(userId)
-  if (!user) {
-    throw Error('该用户不存在!')
-  }
-  if (user.groupIds.includes(groupId)) {
-    throw Error('用户已在该群中!')
-  }
-  const group = await GroupModel.findById(groupId)
-  if (!group) {
-    throw Error('该群组不存在!')
-  }
-
-  group.members.push(userId)
-  user.groupIds.push(groupId)
-
-  return await Promise.all([group.save(), user.save()])
-    .then(() => {
-      return group
-    })
-    .catch((err) => {
-      throw Error(err)
     })
 }
 
